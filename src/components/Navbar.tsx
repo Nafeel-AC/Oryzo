@@ -1,7 +1,6 @@
 import { useState } from 'react'
 import { motion } from 'motion/react'
 import { ChevronRight, ArrowUpRight } from 'lucide-react'
-import { AnimatedThemeToggler } from './AnimatedThemeToggler'
 
 export default function Navbar() {
   const [hoveredIndex, setHoveredIndex] = useState<number | null>(null)
@@ -61,9 +60,7 @@ export default function Navbar() {
       </div>
 
       {/* Right Button */}
-      <div className="flex-1 flex justify-end items-center gap-3">
-        <AnimatedThemeToggler />
-        
+      <div className="flex-1 flex justify-end items-center">
         <motion.button
           whileHover={{ scale: 1.02 }}
           whileTap={{ scale: 0.98 }}
