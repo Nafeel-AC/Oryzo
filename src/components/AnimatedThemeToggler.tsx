@@ -144,12 +144,27 @@ export function AnimatedThemeToggler({
 }: AnimatedThemeTogglerProps) {
   const shape = variant ?? "circle"
   const isControlled = theme !== undefined
-  const [internalIsDark, setInternalIsDark] = useState(false)
+  const [internalIsDark, setInternalIsDark] = useState(() => {
+    if (typeof window !== "undefined") {
+      const saved = localStorage.getItem("theme")
+      if (saved) return saved === "dark"
+      return document.documentElement.classList.contains("dark")
+    }
+    return false
+  })
   const isDark = isControlled ? theme === "dark" : internalIsDark
   const buttonRef = useRef<HTMLButtonElement>(null)
 
   useEffect(() => {
     if (isControlled) return
+
+    // Apply saved theme on mount
+    const savedTheme = localStorage.getItem("theme")
+    if (savedTheme === "dark") {
+      document.documentElement.classList.add("dark")
+    } else if (savedTheme === "light") {
+      document.documentElement.classList.remove("dark")
+    }
 
     const updateTheme = () => {
       setInternalIsDark(document.documentElement.classList.contains("dark"))
@@ -191,9 +206,12 @@ export function AnimatedThemeToggler({
 
     const applyTheme = () => {
       const newTheme = !isDark
-      // Always toggle the class synchronously so the View Transitions API
-      // snapshots the new theme inside the startViewTransition callback.
-      document.documentElement.classList.toggle("dark")
+      // Use explicit add/remove to ensure class matches the state exactly
+      if (newTheme) {
+        document.documentElement.classList.add("dark")
+      } else {
+        document.documentElement.classList.remove("dark")
+      }
       if (isControlled) {
         onThemeChange?.(newTheme ? "dark" : "light")
       } else {

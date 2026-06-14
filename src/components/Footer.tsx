@@ -10,16 +10,38 @@ export default function Footer() {
     const video = videoRef.current
     if (!video) return
 
-    const src = 'https://customer-cbeadsgr09pnsezs.cloudflarestream.com/12a9780eeb1ea015801a5f55cf2e9d3d/manifest/video.m3u8'
+    const src = 'https://d8j0ntlcm91z4.cloudfront.net/user_38xzZboKViGWJOttwIXH07lWA1P/hf_20260306_074215_04640ca7-042c-45d6-bb56-58b1e8a42489.mp4'
+    const isHls = src.endsWith('.m3u8')
 
+    if (!isHls) {
+      // Standard video format (mp4, webm, etc.)
+      video.src = src
+      video.play().catch(e => console.error("Video play error:", e))
+      return () => {
+        video.pause()
+        video.removeAttribute('src')
+        video.load()
+      }
+    }
+
+    // HLS video format (.m3u8)
     if (video.canPlayType('application/vnd.apple.mpegurl')) {
       // Native HLS support (Safari, iOS Safari)
       video.src = src
+      video.play().catch(e => console.error("Native HLS play error:", e))
+      return () => {
+        video.pause()
+        video.removeAttribute('src')
+        video.load()
+      }
     } else if (Hls.isSupported()) {
       // Chrome, Firefox, Edge, etc.
       const hls = new Hls()
       hls.loadSource(src)
       hls.attachMedia(video)
+      hls.on(Hls.Events.MANIFEST_PARSED, () => {
+        video.play().catch(e => console.error("HLS play error:", e))
+      })
       return () => {
         hls.destroy()
       }
@@ -44,7 +66,7 @@ export default function Footer() {
   return (
     <div className="w-full bg-[#f0f0f0] dark:bg-[#0a0c10] pb-16 px-6 md:px-12 flex flex-col items-center select-none font-sans transition-colors duration-300">
       <div className="w-full max-w-[1536px] flex flex-col gap-16 md:gap-24">
-        
+
         {/* HLS Video CTA Banner */}
         <section className="relative w-full min-h-[320px] md:min-h-[380px] rounded-[1.8rem] md:rounded-[3rem] overflow-hidden flex items-center bg-black/10 dark:bg-black/25 group shadow-[0_4px_30px_rgba(0,0,0,0.03)] transition-colors duration-300">
           {/* Video Background */}
@@ -56,7 +78,7 @@ export default function Footer() {
             playsInline
             className="absolute inset-0 w-full h-full object-cover z-0 filter brightness-[0.9] dark:brightness-[0.75] contrast-[1.05] transition-[filter] duration-300"
           />
-          
+
           {/* Dark/Blur overlay for readability */}
           <div className="absolute inset-0 bg-black/15 dark:bg-black/20 z-0" />
 
