@@ -11,7 +11,7 @@ function App() {
       <Footer />
 
       {/* Floating Theme Toggler */}
-      <div className="fixed bottom-6 right-6 z-50">
+      <div className="fixed top-6 right-6 z-50">
         <AnimatedThemeToggler className="p-3 bg-white/80 dark:bg-[#13151b]/80 backdrop-blur-md shadow-xl border-2 border-[rgba(30,50,90,0.15)] dark:border-white/10 rounded-full hover:scale-105 transition-all w-12 h-12 flex items-center justify-center cursor-pointer" />
       </div>
     </main>
